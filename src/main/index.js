@@ -1,4 +1,7 @@
 import { app, BrowserWindow, Menu, ipcMain } from 'electron'
+const os = require('os')
+const path = require('path')
+const fs = require('fs')
 const contextMenu = require('electron-context-menu')
 
 /**
@@ -8,16 +11,16 @@ const contextMenu = require('electron-context-menu')
 if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
+if(!fs.existsSync(path.join(os.homedir(), '/photo-wall'))){
+  fs.mkdirSync(path.join(path.join(os.homedir(), '/photo-wall')))
+}
+// global.__photoWall = path.join(path.join(os.homedir(), '/photo-wall'))
 
-// if(process.env.NODE_ENV === 'development'){
-//   contextMenu({
-//     // prepend: (defaultActions, params, browserWindow) => [{
-//     //   label: '删除文件夹',
-//     //   visible: params.classList.includes('deleteFolder')
-//     // }],
-//     showInspectElement: true
-//   })
-// }
+if(process.env.NODE_ENV === 'development'){
+  // contextMenu({
+  //   showInspectElement: true
+  // })
+}
 
 let mainWindow
 const winURL = process.env.NODE_ENV === 'development'

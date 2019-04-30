@@ -33,6 +33,7 @@ import path from 'path'
 import fs from 'fs'
 const { ipcRenderer, remote } = require('electron')
 const { Menu, MenuItem } = remote
+const os = require('os')
 export default {
   data () {
     return {
@@ -40,7 +41,8 @@ export default {
         newFolder: '',
         newFolderModal: false,
         deleteFolderModal: false,
-        deleteFolderName: ''
+        deleteFolderName: '',
+        staticPath: path.join(path.join(os.homedir(), '/photo-wall'))
     };
   },
   created(){
@@ -62,7 +64,7 @@ export default {
     },
     deleteOk(){
         //删除文件夹
-        this.deleteDir(`${__static}/${this.deleteFolderName}`)
+        this.deleteDir(`${this.staticPath}/${this.deleteFolderName}`)
         this.$Message.info(`${this.deleteFolderName}删除成功`)
         this.deleteFolderName = ''
         this.readDir()
@@ -112,9 +114,9 @@ export default {
     //读取图片文件夹
     readDir(){
         this.folders = []
-        fs.readdirSync(__static).forEach((val, index) => {
+        fs.readdirSync(this.staticPath).forEach((val, index) => {
         // let fPath = `${path}${val}`
-        let fPath = path.join(__static, val)
+        let fPath = path.join(this.staticPath, val)
         let stats = fs.statSync(fPath)
         if(stats.isDirectory())
             this.folders.push(val)
@@ -147,7 +149,7 @@ export default {
         if(this.folders.includes(this.newFolder)){
             this.$Message.warning( "文件夹名称不能重复")
         }else{
-            fs.mkdir(`${__static}\\${this.newFolder}`, (err) => {
+            fs.mkdir(`${this.staticPath}\\${this.newFolder}`, (err) => {
                 if(err){
                     this.$Message.info(`${this.newFolder}创建失败`)
                 }else{

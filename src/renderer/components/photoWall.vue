@@ -28,7 +28,7 @@
                             div.right(@click='nextPicture(item.i)')
       Col(span="6")
         div.logoWrapper
-          img(:src="staticPath+'/logo.jpg'")
+          img(:src="logoPath")
           div.button-wrapper
             Button(type="primary" shape="circle" icon="md-remove" @click='minimize')
             Button(type="primary" shape="circle" icon="ios-square-outline" @click='setFullScreen')
@@ -43,6 +43,7 @@
   import { fail } from 'assert';
   const { ipcRenderer, remote } = require('electron')
   const { Menu, MenuItem } = remote
+  const os = require('os')
 
   export default {
     name: 'landing-page',
@@ -51,8 +52,9 @@
         layout: [],
         imgs: {},
         imgsUrl: [],
-        staticPath: __static,
-        window: remote.getCurrentWindow()
+        staticPath: path.join(path.join(os.homedir(), '/photo-wall')),
+        window: remote.getCurrentWindow(),
+        logoPath: `${__static}/logo.jpg`
       }
     },
   components: { 
@@ -60,6 +62,8 @@
       GridItem,
      },
   created(){
+    log("static", __static)
+    // log("家目录",__photoWall)
       this.readDir()
       this.readImgs()
       this.setMenu()
@@ -121,8 +125,8 @@
       },
       //读取图片文件夹
       readDir(){
-          fs.readdirSync(__static).forEach((val, index) => {
-          let fPath = path.join(__static, val)
+          fs.readdirSync(this.staticPath).forEach((val, index) => {
+          let fPath = path.join(this.staticPath, val)
           let stats = fs.statSync(fPath)
           if(stats.isDirectory())
               this.imgs[fPath] = []
