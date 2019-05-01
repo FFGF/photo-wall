@@ -4,6 +4,7 @@ div.main
   Row
     Col(span="8" offset="8")
       div.uploadWrapper(id="upload-area" 
+        class='upload-area'
         @drop.prevent="onDrop" 
         @dragover.prevent="dragover = true"
         @dragleave.prevent="dragover = false"
@@ -32,9 +33,9 @@ import path from 'path'
 const { ipcRenderer, remote } = require('electron')
 const { Menu, MenuItem, dialog } = remote
 const os = require('os')
-
-
+import mixin from '@/utils/mixin'
 export default {
+  mixins: [mixin],
   data () {
     return {
         folder: '',
@@ -49,7 +50,7 @@ export default {
   created(){
     this.setMenu()
     this.folder = this.$route.params.folder
-    this.folder = `img`
+    // this.folder = `img`
     this.readImgs(path.join(this.staticPath, this.folder))
   },
   methods: {

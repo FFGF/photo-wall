@@ -3,6 +3,11 @@ const os = require('os')
 const path = require('path')
 const fs = require('fs')
 const contextMenu = require('electron-context-menu')
+import pkg from '../../package.json'
+
+if (process.platform === 'win32') {
+  app.setAppUserModelId(pkg.build.appId)
+}
 
 /**
  * Set `__static` path to static files in production
@@ -12,7 +17,7 @@ if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 if(!fs.existsSync(path.join(os.homedir(), '/photo-wall'))){
-  fs.mkdirSync(path.join(path.join(os.homedir(), '/photo-wall')))
+  fs.mkdirSync((path.join(os.homedir(), '/photo-wall')))
 }
 // global.__photoWall = path.join(path.join(os.homedir(), '/photo-wall'))
 

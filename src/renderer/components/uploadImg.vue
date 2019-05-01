@@ -3,11 +3,22 @@
 div.main(@contextmenu="newFolderContextMenu")
     Row
         Col(span="4" style='text-align: center' @click.native="addFolder")
-            Icon(type="ios-add-circle-outline" size="150" )
+            Icon(
+                type="ios-add-circle-outline" 
+                size="150"                
+                )
     Row
-        Col(span="4" v-for="folderName in folders" :key='folderName')
+        Col(span="4" v-for="folderName in folders" :key='folderName' )
             div.folder(@dblclick="goFolder(folderName)", class='deleteFolder' )
-                Icon(type="ios-folder" size="150" @contextmenu.native.stop="deleteFolder(folderName)")
+                Icon(
+                    type="ios-folder" 
+                    size="150" 
+                    @contextmenu.native.stop="deleteFolder(folderName)" 
+                    class='icon upload-area',
+                    @drop.native.prevent="onDrop(folderName, $event)" 
+                    @dragover.native.prevent="dragoverM"
+                    @dragleave.native.prevent="dragleaveM",
+                )
                 span(style="display: block") {{folderName}}
     
     Modal(
@@ -34,6 +45,7 @@ import fs from 'fs'
 const { ipcRenderer, remote } = require('electron')
 const { Menu, MenuItem } = remote
 const os = require('os')
+
 export default {
   data () {
     return {
@@ -42,14 +54,60 @@ export default {
         newFolderModal: false,
         deleteFolderModal: false,
         deleteFolderName: '',
-        staticPath: path.join(path.join(os.homedir(), '/photo-wall'))
+        staticPath: path.join(path.join(os.homedir(), '/photo-wall')),
+        saveImagePath: []
     };
   },
   created(){
     this.readDir()
     this.setMenu()
   },
+  mounted(){
+      this.disableDragEvent()
+  },
   methods: {
+    dragoverM(e){
+        //图片拖拽上去图标变色
+        e.target.classList.add('is-dragover')
+    },
+    dragleaveM(e){
+        //图片离开图标恢复颜色
+        e.target.classList.remove('is-dragover')
+    },
+    disableDragEvent () {
+      window.addEventListener('dragenter', this.disableDrag, false)
+      window.addEventListener('dragover', this.disableDrag)
+      window.addEventListener('drop', this.disableDrag)
+    },
+    disableDrag (e) {
+      const dropzone = document.getElementsByClassName('upload-area')
+      if (dropzone.length === 0 || !Array.from(dropzone).includes(e.target)) {
+        e.preventDefault()
+        e.dataTransfer.effectAllowed = 'none'
+        e.dataTransfer.dropEffect = 'none'
+      }
+    },      
+    onDrop(folderName, e){
+        Array.from(e.dataTransfer.files).forEach((value, index) => {
+            this.saveImagePath.push(value.path)
+        })
+        this.saveImage(folderName)
+    },
+    saveImage(folderName){
+        this.saveImagePath.forEach((value, index) => {
+          let temp = value.split('\\')
+          let imageName = temp[temp.length - 1]
+          fs.copyFile(value, `${this.staticPath}/${folderName}/${imageName}`, (err) => {
+            if(err){
+              this.$Message.info("上传失败")
+            }else{
+              this.$Message.info("上传成功")
+              this.saveImagePath = []
+              this.readDir()
+            }
+          })
+        })
+      },    
     deleteFolder(folderName){
         this.deleteFolderName = folderName
         const menu = new Menu()
@@ -163,7 +221,12 @@ export default {
     cancel(){
         this.newFolder = ''
     }  
-  }
+  },
+  beforeDestroy () {
+    window.removeEventListener('dragenter', this.disableDrag, false)
+    window.removeEventListener('dragover', this.disableDrag)
+    window.removeEventListener('drop', this.disableDrag)
+  }  
 }
 
 </script>
@@ -171,4 +234,9 @@ export default {
 .main
     .folder
         text-align center
+        .is-dragover
+            color rgba(76, 162, 127, 0.68)
+        .icon
+            &:hover
+                color rgba(76, 162, 127, 0.68)
 </style>

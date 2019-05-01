@@ -44,9 +44,11 @@
   const { ipcRenderer, remote } = require('electron')
   const { Menu, MenuItem } = remote
   const os = require('os')
+  import mixin from '@/utils/mixin'
 
   export default {
     name: 'landing-page',
+    mixins: [mixin],
     data(){
       return {
         layout: [],
