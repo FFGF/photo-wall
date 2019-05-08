@@ -43,7 +43,8 @@ export default {
         saveImagePath: [],
         deleteImgName: '',
         deleteImgModal: false,
-        staticPath: path.join(path.join(os.homedir(), '/photo-wall')),
+        // staticPath: path.join(path.join(os.homedir(), '/photo-wall')),
+        staticPath: __static,
         dragover: false
     };
   },

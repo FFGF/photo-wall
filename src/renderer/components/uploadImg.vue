@@ -54,7 +54,8 @@ export default {
         newFolderModal: false,
         deleteFolderModal: false,
         deleteFolderName: '',
-        staticPath: path.join(path.join(os.homedir(), '/photo-wall')),
+        // staticPath: path.join(path.join(os.homedir(), '/photo-wall')),
+        staticPath: __static,
         saveImagePath: []
     };
   },

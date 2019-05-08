@@ -22,9 +22,9 @@ if(!fs.existsSync(path.join(os.homedir(), '/photo-wall'))){
 // global.__photoWall = path.join(path.join(os.homedir(), '/photo-wall'))
 
 if(process.env.NODE_ENV === 'development'){
-  // contextMenu({
-  //   showInspectElement: true
-  // })
+  contextMenu({
+    showInspectElement: true
+  })
 }
 
 let mainWindow
